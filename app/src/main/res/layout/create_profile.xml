@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/welcomeText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100sp"
+        android:fontFamily="@font/righteous"
+        android:gravity="center_horizontal"
+        android:text="Welcome, friend!"
+        android:textColor="#D6675D"
+        android:textSize="38sp" />
+
+    <TextView
+        android:id="@+id/startedText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10sp"
+        android:fontFamily="@font/outfit_medium"
+        android:gravity="center_horizontal"
+        android:text="Let's get you started"
+        android:textColor="#3C1613"
+        android:textSize="23sp" />
+
+    <EditText
+        android:id="@+id/nameInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="50sp"
+        android:layout_marginTop="50sp"
+        android:layout_marginRight="50sp"
+        android:background="@drawable/edit_text_background"
+        android:ems="10"
+        android:hint="Name"
+        android:inputType="text"
+        android:padding="12dp"
+        android:textColor="@android:color/black"
+        android:textColorHint="#BDBDBD"
+        android:textSize="16sp" />
+
+    <EditText
+        android:id="@+id/ageInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="50sp"
+        android:layout_marginTop="20sp"
+        android:layout_marginRight="50sp"
+        android:background="@drawable/edit_text_background"
+        android:ems="10"
+        android:hint="Age"
+        android:inputType="number"
+        android:padding="12dp"
+        android:textColor="@android:color/black"
+        android:textColorHint="#BDBDBD"
+        android:textSize="16sp" />
+
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="50sp"
+        android:layout_marginTop="20sp"
+        android:layout_marginRight="50sp"
+        android:background="@drawable/edit_text_background"
+        android:ems="10"
+        android:padding="12dp"
+        android:textColor="@android:color/black"
+        android:textColorHint="#BDBDBD"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50sp"
+        android:fontFamily="@font/outfit_medium"
+        android:gravity="center_horizontal"
+        android:text="All fields must be filled up"
+        android:textColor="#C4544A" />
+
+    <Button
+        android:id="@+id/customButton"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="50sp"
+        android:background="@drawable/button_background"
+        android:fontFamily="@font/inter_semibold"
+        android:paddingLeft="20dp"
+        android:paddingTop="10dp"
+        android:paddingRight="20dp"
+        android:paddingBottom="10dp"
+        android:text="All Done!"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp" />
+
+</LinearLayout>

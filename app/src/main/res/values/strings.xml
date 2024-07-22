@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">WanderFriend</string>
+    <string-array name="countries">
+        <item>Country</item>
+        <item>Country 1</item>
+        <item>Country 2</item>
+        <item>Country 3</item>
+        <item>Country 4</item>
+    </string-array>
 </resources>
