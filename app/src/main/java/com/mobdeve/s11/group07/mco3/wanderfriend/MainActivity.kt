@@ -1,47 +1,21 @@
 package com.mobdeve.s11.group07.mco3.wanderfriend
 
+import android.graphics.Typeface
 import android.os.Bundle
+import android.widget.TextView
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.mobdeve.s11.group07.mco3.wanderfriend.ui.theme.WanderFriendTheme
+import androidx.core.content.res.ResourcesCompat
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent {
-            WanderFriendTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
-        }
-    }
-}
+        setContentView(R.layout.loading_screen)
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+        val textView: TextView = findViewById(R.id.name)
+        val typeface: Typeface? = ResourcesCompat.getFont(this, R.font.righteous)
+        textView.typeface = typeface
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    WanderFriendTheme {
-        Greeting("Android")
     }
 }
