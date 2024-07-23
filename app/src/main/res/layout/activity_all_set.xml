@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical"
+    android:orientation="vertical"
+    tools:context=".AllSet">
+
+    <ImageView
+        android:id="@+id/bigCheck"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_gravity="center_horizontal"
+        app:srcCompat="@drawable/big_check" />
+
+    <TextView
+        android:id="@+id/congratsText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:fontFamily="@font/outfit_medium"
+        android:gravity="center_horizontal"
+        android:text="Congratulations!"
+        android:textColor="#27214D"
+        android:textSize="32sp" />
+
+    <TextView
+        android:id="@+id/detailsText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:fontFamily="@font/outfit_medium"
+        android:gravity="center_horizontal"
+        android:text="You’re all set!\nLet’s start making\nmemories together"
+        android:textColor="#27214D"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/tapText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100sp"
+        android:fontFamily="@font/outfit_medium"
+        android:gravity="center_horizontal"
+        android:text="Tap anywhere to continue"
+        android:textColor="#C4544A"
+        android:textSize="20sp" />
+</LinearLayout>

@@ -16,9 +16,13 @@
         android:theme="@style/Theme.WanderFriend"
         tools:targetApi="31">
         <activity
-            android:name=".CountriesSignup"
+            android:name=".AllSet"
             android:exported="true"
             android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"/>
+        <activity
+            android:name=".CountriesSignup"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar" />
         <activity
             android:name=".CreateProfileActivity"
             android:exported="true"

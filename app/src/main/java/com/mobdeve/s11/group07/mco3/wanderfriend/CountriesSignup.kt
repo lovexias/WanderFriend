@@ -1,8 +1,10 @@
 package com.mobdeve.s11.group07.mco3.wanderfriend
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,6 +20,7 @@ class CountriesSignup : AppCompatActivity() {
     private lateinit var recyclerViewCountries: RecyclerView
     private lateinit var searchField: EditText
     private lateinit var fabDone: FloatingActionButton
+    private lateinit var noCountryBtn: Button
     private var countriesList: List<Country> = listOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,10 +30,16 @@ class CountriesSignup : AppCompatActivity() {
         recyclerViewCountries = findViewById(R.id.recyclerViewCountries)
         searchField = findViewById(R.id.searchField)
         fabDone = findViewById(R.id.fabDone)
+        noCountryBtn = findViewById(R.id.noCountryBtn)
 
         recyclerViewCountries.layoutManager = LinearLayoutManager(this)
 
         fetchCountries()
+
+        noCountryBtn.setOnClickListener {
+            val intent = Intent(this, AllSet::class.java)
+            startActivity(intent)
+        }
 
         // Implement search filter
         searchField.addTextChangedListener(object : TextWatcher {
@@ -44,7 +53,8 @@ class CountriesSignup : AppCompatActivity() {
         })
 
         fabDone.setOnClickListener {
-            // Handle FAB click
+            val intent = Intent(this, AllSet::class.java)
+            startActivity(intent)
         }
     }
 
