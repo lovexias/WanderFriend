@@ -2,30 +2,28 @@ package com.mobdeve.s11.group07.mco3.wanderfriend
 
 import android.graphics.Typeface
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.Spinner
-import android.widget.TextView
+import android.widget.*
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
-import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import com.mobdeve.s11.group07.mco3.wanderfriend.RetrofitInstance
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : ComponentActivity() {
+    private lateinit var countrySpinner: Spinner
+    private lateinit var spinnerTypeface: Typeface
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.create_profile)
 
-        // loading_screen
-//        val textView: TextView = findViewById(R.id.name)
-//        val typeface: Typeface? = ResourcesCompat.getFont(this, R.font.righteous)
-//        textView.typeface = typeface
-
-        // create_profile
+        // Set typefaces for text views and edit texts
         val welcomeText: TextView = findViewById(R.id.welcomeText)
         val welcomeTypeface: Typeface? = ResourcesCompat.getFont(this, R.font.righteous)
         welcomeText.typeface = welcomeTypeface
@@ -34,61 +32,58 @@ class MainActivity : ComponentActivity() {
         val startedTypeface: Typeface? = ResourcesCompat.getFont(this, R.font.outfit_medium)
         startedText.typeface = startedTypeface
 
-        val editText: EditText = findViewById(R.id.nameInput)
+        val nameInput: EditText = findViewById(R.id.nameInput)
         val inputTypeface: Typeface? = ResourcesCompat.getFont(this, R.font.inter_semibold)
-        editText.typeface = inputTypeface
+        nameInput.typeface = inputTypeface
 
-        val ageText: EditText = findViewById(R.id.ageInput)
+        val ageInput: EditText = findViewById(R.id.ageInput)
         val ageTypeface: Typeface? = ResourcesCompat.getFont(this, R.font.inter_semibold)
-        ageText.typeface = ageTypeface
+        ageInput.typeface = ageTypeface
 
-        // Find the Spinner by its ID
-        val spinner: Spinner = findViewById(R.id.spinner)
-        val spinnerTypeface: Typeface? = ResourcesCompat.getFont(this, R.font.inter_semibold)
+        // Set up the Spinner
+        countrySpinner = findViewById(R.id.spinner)
+        spinnerTypeface = ResourcesCompat.getFont(this, R.font.inter_semibold)!!
 
-        // Create an ArrayAdapter using the custom spinner item layout
-        val adapter = object : ArrayAdapter<String>(
-            this,
-            R.layout.spinner_item,
-            resources.getStringArray(R.array.countries)
-        ) {
-            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-                val view = super.getView(position, convertView, parent)
-                val textView = view.findViewById<TextView>(android.R.id.text1)
-                textView.typeface = spinnerTypeface
-                return view
+        fetchCountries()
+    }
+
+    private fun fetchCountries() {
+        RetrofitInstance.api.getAllCountries().enqueue(object : Callback<List<Country>> {
+            override fun onResponse(call: Call<List<Country>>, response: Response<List<Country>>) {
+                if (response.isSuccessful) {
+                    response.body()?.let { countries ->
+                        val sortedCountries = countries.sortedBy { it.name.common }
+                        val countryNames = sortedCountries.map { it.name.common }
+                        val adapter = object : ArrayAdapter<String>(
+                            this@MainActivity,
+                            R.layout.spinner_item,
+                            countryNames
+                        ) {
+                            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                                val view = super.getView(position, convertView, parent)
+                                val textView = view.findViewById<TextView>(android.R.id.text1)
+                                textView.typeface = spinnerTypeface
+                                return view
+                            }
+
+                            override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+                                val view = super.getDropDownView(position, convertView, parent)
+                                val textView = view.findViewById<TextView>(android.R.id.text1)
+                                textView.typeface = spinnerTypeface
+                                return view
+                            }
+                        }
+                        adapter.setDropDownViewResource(R.layout.spinner_item)
+                        countrySpinner.adapter = adapter
+                    }
+                } else {
+                    Log.e("MainActivity", "Response not successful: ${response.errorBody()?.string()}")
+                }
             }
 
-            override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
-                val view = super.getDropDownView(position, convertView, parent)
-                val textView = view.findViewById<TextView>(android.R.id.text1)
-                textView.typeface = spinnerTypeface
-                return view
+            override fun onFailure(call: Call<List<Country>>, t: Throwable) {
+                Log.e("MainActivity", "Error fetching countries", t)
             }
-        }
-
-        // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(R.layout.spinner_item)
-
-        // Apply the adapter to the spinner
-        spinner.adapter = adapter
-
-        // Set the default selection to "Country"
-        spinner.setSelection(0)
-
-        // Handle Spinner selections
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                val selectedItem = parent.getItemAtPosition(position).toString()
-                // Handle the selected item
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                // Another interface callback
-            }
-        }
-
-
-
+        })
     }
 }
