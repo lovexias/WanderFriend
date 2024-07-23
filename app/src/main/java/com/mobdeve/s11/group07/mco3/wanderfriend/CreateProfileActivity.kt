@@ -1,5 +1,6 @@
 package com.mobdeve.s11.group07.mco3.wanderfriend
 
+import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
@@ -16,6 +17,7 @@ import retrofit2.Response
 class CreateProfileActivity : ComponentActivity() {
     private lateinit var countrySpinner: Spinner
     private lateinit var spinnerTypeface: Typeface
+    private lateinit var customButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +45,13 @@ class CreateProfileActivity : ComponentActivity() {
         spinnerTypeface = ResourcesCompat.getFont(this, R.font.inter_semibold)!!
 
         fetchCountries()
+
+        // Set up the custom button
+        customButton = findViewById(R.id.customButton)
+        customButton.setOnClickListener {
+            val intent = Intent(this, CountriesSignup::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun fetchCountries() {

@@ -23,6 +23,6 @@ class LoadingScreenActivity : ComponentActivity() {
             val intent = Intent(this, CreateProfileActivity::class.java)
             startActivity(intent)
             finish()
-        }, 5000) // 5 seconds delay
+        }, 1000) // 1 second delay, change to 5000 later
     }
 }

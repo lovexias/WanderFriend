@@ -7,4 +7,5 @@
         <item>Country 3</item>
         <item>Country 4</item>
     </string-array>
+    <string name="country_flag">Country flag</string>
 </resources>
