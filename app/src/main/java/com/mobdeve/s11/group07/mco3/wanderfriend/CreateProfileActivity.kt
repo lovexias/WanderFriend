@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.activity.ComponentActivity
 import androidx.core.content.res.ResourcesCompat
-import com.mobdeve.s11.group07.mco3.wanderfriend.RetrofitInstance
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -49,8 +48,9 @@ class CreateProfileActivity : ComponentActivity() {
         // Set up the custom button
         customButton = findViewById(R.id.customButton)
         customButton.setOnClickListener {
-            val intent = Intent(this, CountriesSignup::class.java)
+            val intent = Intent(this, CountriesSignupActivity::class.java)
             startActivity(intent)
+            finish()
         }
     }
 

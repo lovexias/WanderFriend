@@ -10,12 +10,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.mobdeve.s11.group07.mco3.wanderfriend.RetrofitInstance
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class CountriesSignup : AppCompatActivity() {
+class CountriesSignupActivity : AppCompatActivity() {
     private lateinit var countriesAdapter: CountriesAdapter
     private lateinit var recyclerViewCountries: RecyclerView
     private lateinit var searchField: EditText
@@ -37,8 +36,9 @@ class CountriesSignup : AppCompatActivity() {
         fetchCountries()
 
         noCountryBtn.setOnClickListener {
-            val intent = Intent(this, AllSet::class.java)
+            val intent = Intent(this, AllSetActivity::class.java)
             startActivity(intent)
+            finish()
         }
 
         // Implement search filter
@@ -53,8 +53,9 @@ class CountriesSignup : AppCompatActivity() {
         })
 
         fabDone.setOnClickListener {
-            val intent = Intent(this, AllSet::class.java)
+            val intent = Intent(this, AllSetActivity::class.java)
             startActivity(intent)
+            finish()
         }
     }
 
