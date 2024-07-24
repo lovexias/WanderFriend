@@ -8,8 +8,6 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import retrofit2.Call
@@ -32,7 +30,7 @@ class JournalCountriesActivity : AppCompatActivity() {
         recyclerViewCountries = findViewById(R.id.recyclerViewCountries)
         searchField = findViewById(R.id.searchField)
         backBtn = findViewById(R.id.backBtn)
-        proceedBtn = findViewById(R.id.proceedBtn)
+        proceedBtn = findViewById(R.id.cancelBtn)
 
         recyclerViewCountries.layoutManager = LinearLayoutManager(this)
 
@@ -40,6 +38,11 @@ class JournalCountriesActivity : AppCompatActivity() {
 
         backBtn.setOnClickListener {
             finish()
+        }
+
+        proceedBtn.setOnClickListener{
+            val intent = Intent(this, JournalSubtitleActivity::class.java)
+            startActivity(intent)
         }
 
         // search filter

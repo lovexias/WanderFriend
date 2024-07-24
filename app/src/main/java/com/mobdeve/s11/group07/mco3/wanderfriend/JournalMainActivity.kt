@@ -5,8 +5,6 @@ import android.os.Bundle
 import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -23,7 +21,7 @@ class JournalMainActivity : AppCompatActivity() {
 
         journalRecyclerView = findViewById(R.id.journalRecyclerView)
         journalRecyclerView.layoutManager = LinearLayoutManager(this)
-        newJournalBtn = findViewById(R.id.newJournalBtn)
+        newJournalBtn = findViewById(R.id.submitJournalBtn)
 
         newJournalBtn.setOnClickListener {
             val intent = Intent(this, JournalCountriesActivity::class.java)

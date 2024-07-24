@@ -16,7 +16,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/newJournalBtn"
+        android:id="@+id/submitJournalBtn"
         android:layout_width="320dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"

@@ -16,9 +16,13 @@
         android:theme="@style/Theme.WanderFriend"
         tools:targetApi="31">
         <activity
-            android:name=".JournalCountriesActivity"
+            android:name=".JournalSubtitleActivity"
             android:exported="true"
             android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"/>
+        <activity
+            android:name=".JournalCountriesActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar" />
         <activity
             android:name=".JournalMainActivity"
             android:exported="true"
