@@ -12,7 +12,7 @@ import androidx.core.content.res.ResourcesCompat
 class LoadingScreenActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.loading_screen)
+        setContentView(R.layout.activity_loading_screen)
 
         val textView: TextView = findViewById(R.id.name)
         val typeface: Typeface? = ResourcesCompat.getFont(this, R.font.righteous)

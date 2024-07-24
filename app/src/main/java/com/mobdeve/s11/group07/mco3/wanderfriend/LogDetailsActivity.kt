@@ -3,17 +3,24 @@ package com.mobdeve.s11.group07.mco3.wanderfriend
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import kotlin.math.log
 
-class NewLogOptionsActivity : AppCompatActivity() {
+class LogDetailsActivity : AppCompatActivity() {
 
     private lateinit var backBtn: Button
-    private lateinit var uploadPhoto: Button
-    private lateinit var takePhoto: Button
+    private lateinit var logPhoto: ImageView
+    private lateinit var dateInput: EditText
+    private lateinit var editTextCaption: EditText
+    private lateinit var errorMessage: TextView
+    private lateinit var submitBtn: Button
 
     private lateinit var cameraButton: ImageButton
     private lateinit var journalButton: ImageButton
@@ -22,11 +29,22 @@ class NewLogOptionsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_new_log_options)
+        setContentView(R.layout.activity_log_details)
 
         backBtn = findViewById(R.id.backBtn)
-        uploadPhoto = findViewById(R.id.uploadPhoto)
-        takePhoto = findViewById(R.id.takePhoto)
+        logPhoto = findViewById(R.id.logPhoto)
+        dateInput = findViewById(R.id.dateInput)
+        editTextCaption = findViewById(R.id.editTextCaption)
+        errorMessage = findViewById(R.id.errorMessage)
+        submitBtn = findViewById(R.id.submitBtn)
+
+        backBtn.setOnClickListener {
+            finish()
+        }
+
+        submitBtn.setOnClickListener {
+            // TODO: Must redirect to the journal it was added to 
+        }
 
         // FOOTER BUTTONS, this code must be present in every activity with a footer
         cameraButton = findViewById(R.id.cameraButton)
@@ -48,5 +66,6 @@ class NewLogOptionsActivity : AppCompatActivity() {
         }
 
         // END OF FOOTER BUTTONS
+
     }
 }

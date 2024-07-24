@@ -20,7 +20,7 @@ class CreateProfileActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.create_profile)
+        setContentView(R.layout.activity_create_profile)
 
         // Set typefaces for text views and edit texts
         val welcomeText: TextView = findViewById(R.id.welcomeText)

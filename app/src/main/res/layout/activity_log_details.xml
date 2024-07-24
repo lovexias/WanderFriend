@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".JournalSubtitleActivity">
+    tools:context=".LogDetailsActivity">
 
     <Button
         android:id="@+id/backBtn"
@@ -19,46 +19,47 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/cancelBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:layout_marginEnd="30dp"
-        android:background="@drawable/cancel_button"
-        android:text="Cancel"
-        android:textColor="#FFFFFF"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <ImageView
-        android:id="@+id/countryFlag"
-        android:layout_width="wrap_content"
-        android:layout_height="150dp"
-        android:layout_marginTop="52dp"
+        android:id="@+id/logPhoto"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="25dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/backBtn"
         tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
-        android:id="@+id/countryName"
+        android:id="@+id/dateText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="30dp"
         android:fontFamily="@font/outfit_medium"
-        android:text="TextView"
-        android:textSize="32sp"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:text="Date"
+        android:textColor="#27214D"
+        android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/countryFlag" />
+        app:layout_constraintTop_toBottomOf="@+id/logPhoto" />
+
+    <EditText
+        android:id="@+id/dateInput"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="23dp"
+        android:layout_marginEnd="100dp"
+        android:text="MM/DD/YY"
+        android:textColor="#27214D"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logPhoto" />
 
     <EditText
         android:id="@+id/editTextCaption"
         android:layout_width="244dp"
         android:layout_height="100dp"
         android:layout_margin="16dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="30dp"
         android:background="@drawable/rounded_edittext"
         android:hint="Caption here..."
         android:padding="16dp"
@@ -66,14 +67,25 @@
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/countryName" />
+        app:layout_constraintTop_toBottomOf="@+id/dateText" />
+
+    <TextView
+        android:id="@+id/errorMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:fontFamily="@font/outfit_medium"
+        android:gravity="center_horizontal"
+        android:text="All fields must be filled up"
+        android:textColor="#C4544A"
+        app:layout_constraintTop_toBottomOf="@+id/editTextCaption"
+        tools:layout_editor_absoluteX="-27dp" />
 
     <Button
-        android:id="@+id/submitJournalBtn"
+        android:id="@+id/submitBtn"
         android:layout_width="320dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="65dp"
-        android:layout_marginBottom="80dp"
+        android:layout_marginTop="15dp"
         android:background="@drawable/button_background"
         android:fontFamily="@font/inter_semibold"
         android:padding="16dp"
@@ -82,7 +94,7 @@
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextCaption" />
+        app:layout_constraintTop_toBottomOf="@+id/errorMessage" />
 
     <include
         android:id="@+id/footer"
@@ -92,5 +104,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
