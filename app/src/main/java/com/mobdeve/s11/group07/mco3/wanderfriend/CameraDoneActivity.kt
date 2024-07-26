@@ -1,55 +1,38 @@
 package com.mobdeve.s11.group07.mco3.wanderfriend
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
-import android.widget.ImageButton
-import androidx.activity.enableEdgeToEdge
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 
 class CameraDoneActivity : AppCompatActivity() {
 
-    private lateinit var storeBtn: Button
-    private lateinit var discardBtn: Button
-
-    private lateinit var cameraButton: ImageButton
-    private lateinit var journalButton: ImageButton
-    private lateinit var mapButton: ImageButton
+    private lateinit var photoView: ImageView
+    private lateinit var storeButton: Button
+    private lateinit var discardButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_camera_done)
 
-        storeBtn = findViewById(R.id.storeBtn)
-        discardBtn = findViewById(R.id.discardBtn)
+        photoView = findViewById(R.id.imageView)
+        storeButton = findViewById(R.id.storeBtn)
+        discardButton = findViewById(R.id.discardBtn)
 
-        discardBtn.setOnClickListener {
-            finish()
+        // Assuming the photo is passed as a URI string in the intent
+        val photoUri = intent.getStringExtra("photoUri")
+        photoUri?.let {
+            photoView.setImageURI(Uri.parse(it))
         }
 
-        // FOOTER BUTTONS, this code must be present in every activity with a footer
-        cameraButton = findViewById(R.id.cameraButton)
-        cameraButton.setOnClickListener{
-            val intent = Intent(this, CameraActivity::class.java)
-            startActivity(intent)
+        storeButton.setOnClickListener {
+            // Handle storing the photo in a journal
         }
 
-        journalButton = findViewById(R.id.journalButton)
-        journalButton.setOnClickListener {
-            val intent = Intent(this, JournalMainActivity::class.java)
-            startActivity(intent)
-            finish()
+        discardButton.setOnClickListener {
+            // Handle discarding the photo
         }
-
-        mapButton = findViewById(R.id.mapButton)
-        mapButton.setOnClickListener{
-            TODO("Implement start of activity once MapActivity is created")
-        }
-
-        // END OF FOOTER BUTTONS
-
     }
 }
