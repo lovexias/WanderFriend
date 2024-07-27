@@ -6,7 +6,6 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.widget.Button
 import android.widget.EditText
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,18 +18,18 @@ class JournalCountriesActivity : AppCompatActivity() {
     private lateinit var recyclerViewCountries: RecyclerView
     private lateinit var searchField: EditText
     private lateinit var backBtn: Button
-    private lateinit var proceedBtn: Button
+    private lateinit var cancelBtn: Button
     private var countriesList: List<Country> = listOf()
+    private val selectedCountries = mutableListOf<Country>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_journal_countries)
 
         recyclerViewCountries = findViewById(R.id.recyclerViewCountries)
         searchField = findViewById(R.id.searchField)
         backBtn = findViewById(R.id.backBtn)
-        proceedBtn = findViewById(R.id.cancelBtn)
+        cancelBtn = findViewById(R.id.cancelBtn)
 
         recyclerViewCountries.layoutManager = LinearLayoutManager(this)
 
@@ -40,12 +39,11 @@ class JournalCountriesActivity : AppCompatActivity() {
             finish()
         }
 
-        proceedBtn.setOnClickListener{
+        cancelBtn.setOnClickListener {
             val intent = Intent(this, JournalSubtitleActivity::class.java)
             startActivity(intent)
         }
 
-        // search filter
         searchField.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -63,7 +61,13 @@ class JournalCountriesActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     response.body()?.let { countries ->
                         countriesList = countries.sortedBy { it.name.common }
-                        countriesAdapter = CountriesAdapter(countriesList)
+                        countriesAdapter = CountriesAdapter(countriesList) { country, isSelected ->
+                            if (isSelected) {
+                                selectedCountries.add(country)
+                            } else {
+                                selectedCountries.remove(country)
+                            }
+                        }
                         recyclerViewCountries.adapter = countriesAdapter
                     }
                 }
@@ -79,7 +83,6 @@ class JournalCountriesActivity : AppCompatActivity() {
         val filteredList = countriesList.filter {
             it.name.common.contains(text, ignoreCase = true)
         }
-        countriesAdapter = CountriesAdapter(filteredList)
-        recyclerViewCountries.adapter = countriesAdapter
+        countriesAdapter.updateList(filteredList)
     }
 }

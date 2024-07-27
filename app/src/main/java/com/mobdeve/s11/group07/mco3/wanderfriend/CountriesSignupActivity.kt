@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
@@ -21,10 +22,15 @@ class CountriesSignupActivity : AppCompatActivity() {
     private lateinit var fabDone: FloatingActionButton
     private lateinit var noCountryBtn: Button
     private var countriesList: List<Country> = listOf()
+    private val selectedCountries = mutableListOf<Country>()
+
+    private lateinit var dbHelper: UserDatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_countries_signup)
+
+        dbHelper = UserDatabaseHelper(this)
 
         recyclerViewCountries = findViewById(R.id.recyclerViewCountries)
         searchField = findViewById(R.id.searchField)
@@ -36,12 +42,9 @@ class CountriesSignupActivity : AppCompatActivity() {
         fetchCountries()
 
         noCountryBtn.setOnClickListener {
-            val intent = Intent(this, AllSetActivity::class.java)
-            startActivity(intent)
-            finish()
+            saveSelectedCountriesAndProceed()
         }
 
-        // Implement search filter
         searchField.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -53,9 +56,7 @@ class CountriesSignupActivity : AppCompatActivity() {
         })
 
         fabDone.setOnClickListener {
-            val intent = Intent(this, AllSetActivity::class.java)
-            startActivity(intent)
-            finish()
+            saveSelectedCountriesAndProceed()
         }
     }
 
@@ -65,14 +66,36 @@ class CountriesSignupActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     response.body()?.let { countries ->
                         countriesList = countries.sortedBy { it.name.common }
-                        countriesAdapter = CountriesAdapter(countriesList)
+                        countriesAdapter = CountriesAdapter(countriesList) { country, isSelected ->
+                            if (isSelected) {
+                                selectedCountries.add(country)
+                                Log.d("CountriesSignupActivity", "Country added: ${country.name.common}")
+                                Log.d("CountriesSignupActivity", "Current selected countries: ${selectedCountries.map { it.name.common }}")
+                            } else {
+                                selectedCountries.remove(country)
+                                Log.d("CountriesSignupActivity", "Country removed: ${country.name.common}")
+                                Log.d("CountriesSignupActivity", "Current selected countries: ${selectedCountries.map { it.name.common }}")
+                            }
+                        }
                         recyclerViewCountries.adapter = countriesAdapter
+
+                        // Add initial country if provided
+                        val initialCountryName = intent.getStringExtra("initialCountry")
+                        initialCountryName?.let { name ->
+                            countries.find { it.name.common == name }?.let { country ->
+                                selectedCountries.add(country)
+                                countriesAdapter.notifyDataSetChanged()
+                                Log.d("CountriesSignupActivity", "Initial country added: ${country.name.common}")
+                                Log.d("CountriesSignupActivity", "Current selected countries: ${selectedCountries.map { it.name.common }}")
+                            }
+                        }
                     }
                 }
             }
 
             override fun onFailure(call: Call<List<Country>>, t: Throwable) {
                 // Handle error
+                Log.e("CountriesSignupActivity", "Error fetching countries", t)
             }
         })
     }
@@ -81,7 +104,20 @@ class CountriesSignupActivity : AppCompatActivity() {
         val filteredList = countriesList.filter {
             it.name.common.contains(text, ignoreCase = true)
         }
-        countriesAdapter = CountriesAdapter(filteredList)
-        recyclerViewCountries.adapter = countriesAdapter
+        countriesAdapter.updateList(filteredList)
+    }
+
+    private fun saveSelectedCountriesAndProceed() {
+        val user = dbHelper.getUser() ?: return
+        // Combine initial country and selected countries
+        val allCountries = user.traveledCountries.toMutableList().apply {
+            addAll(selectedCountries)
+        }.distinct()
+        val updatedUser = user.copy(traveledCountries = allCountries)
+        val success = dbHelper.addUser(updatedUser)
+        Log.d("CountriesSignupActivity", "Selected countries to be saved: ${allCountries.map { it.name.common }}, Success: $success")
+        val intent = Intent(this, JournalMainActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }

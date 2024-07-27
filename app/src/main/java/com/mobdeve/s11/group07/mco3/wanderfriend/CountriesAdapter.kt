@@ -10,10 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 
 class CountriesAdapter(
-    private val countries: List<Country>
+    private var countries: List<Country>,
+    private val onCountrySelected: (Country, Boolean) -> Unit
 ) : RecyclerView.Adapter<CountriesAdapter.CountryViewHolder>() {
-
-    private val selectedCountries = mutableSetOf<Country>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CountryViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_country, parent, false)
@@ -29,6 +28,11 @@ class CountriesAdapter(
         return countries.size
     }
 
+    fun updateList(newCountries: List<Country>) {
+        countries = newCountries
+        notifyDataSetChanged()
+    }
+
     inner class CountryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val countryFlag: ImageView = itemView.findViewById(R.id.countryFlag)
         private val countryName: TextView = itemView.findViewById(R.id.countryName)
@@ -41,15 +45,11 @@ class CountriesAdapter(
             } else {
                 countryFlag.setImageResource(R.drawable.placeholder) // Placeholder image if flag URL is empty
             }
-            countryCheckBox.isChecked = selectedCountries.contains(country)
 
             itemView.setOnClickListener {
-                if (countryCheckBox.isChecked) {
-                    selectedCountries.remove(country)
-                } else {
-                    selectedCountries.add(country)
-                }
-                countryCheckBox.isChecked = !countryCheckBox.isChecked
+                val isSelected = countryCheckBox.isChecked
+                countryCheckBox.isChecked = !isSelected
+                onCountrySelected(country, !isSelected)
             }
         }
     }

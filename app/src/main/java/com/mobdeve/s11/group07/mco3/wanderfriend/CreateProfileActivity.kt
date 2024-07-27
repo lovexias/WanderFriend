@@ -17,9 +17,27 @@ class CreateProfileActivity : ComponentActivity() {
     private lateinit var countrySpinner: Spinner
     private lateinit var spinnerTypeface: Typeface
     private lateinit var customButton: Button
+    private lateinit var nameInput: EditText
+    private lateinit var ageInput: EditText
+    private lateinit var errorMessage: TextView
+
+    private lateinit var dbHelper: UserDatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        dbHelper = UserDatabaseHelper(this)
+
+        // Check if user already exists
+        if (dbHelper.getUser() != null) {
+            // Redirect to JournalMainActivity if user exists
+            val intent = Intent(this, JournalMainActivity::class.java)
+            startActivity(intent)
+            finish()
+            return
+        }
+
+        // If no user exists, show the profile creation layout
         setContentView(R.layout.activity_create_profile)
 
         // Set typefaces for text views and edit texts
@@ -31,13 +49,15 @@ class CreateProfileActivity : ComponentActivity() {
         val startedTypeface: Typeface? = ResourcesCompat.getFont(this, R.font.outfit_medium)
         startedText.typeface = startedTypeface
 
-        val nameInput: EditText = findViewById(R.id.nameInput)
+        nameInput = findViewById(R.id.nameInput)
         val inputTypeface: Typeface? = ResourcesCompat.getFont(this, R.font.inter_semibold)
         nameInput.typeface = inputTypeface
 
-        val ageInput: EditText = findViewById(R.id.ageInput)
+        ageInput = findViewById(R.id.ageInput)
         val ageTypeface: Typeface? = ResourcesCompat.getFont(this, R.font.inter_semibold)
         ageInput.typeface = ageTypeface
+
+        errorMessage = findViewById(R.id.errorMessage)
 
         // Set up the Spinner
         countrySpinner = findViewById(R.id.spinner)
@@ -48,9 +68,25 @@ class CreateProfileActivity : ComponentActivity() {
         // Set up the custom button
         customButton = findViewById(R.id.customButton)
         customButton.setOnClickListener {
-            val intent = Intent(this, CountriesSignupActivity::class.java)
-            startActivity(intent)
-            finish()
+            val name = nameInput.text.toString()
+            val age = ageInput.text.toString().toIntOrNull()
+            val country = countrySpinner.selectedItem?.toString()
+
+            if (name.isEmpty() || age == null || country == null) {
+                errorMessage.visibility = View.VISIBLE
+            } else {
+                val user = User(name = name, age = age, country = country, traveledCountries = emptyList())
+                val success = dbHelper.addUser(user)
+                if (success) {
+                    val intent = Intent(this, CountriesSignupActivity::class.java)
+                    intent.putExtra("initialCountry", country)
+                    startActivity(intent)
+                    finish()
+                } else {
+                    errorMessage.text = "Error saving user. Please try again."
+                    errorMessage.visibility = View.VISIBLE
+                }
+            }
         }
     }
 
