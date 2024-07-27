@@ -1,8 +1,9 @@
 package com.mobdeve.s11.group07.mco3.wanderfriend
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
@@ -47,25 +48,37 @@ class JournalSubtitleActivity : AppCompatActivity() {
             }
         }
 
-        backBtn.setOnClickListener{
-            finish()
+        backBtn.setOnClickListener {
+            finish()  // Return to the previous activity (JournalCountriesActivity)
         }
 
-        cancelBtn.setOnClickListener{
+        cancelBtn.setOnClickListener {
             val intent = Intent(this, JournalMainActivity::class.java)
             startActivity(intent)
-            finish()
+            finish()  // Return to JournalMainActivity
         }
 
-        submitJournalBtn.setOnClickListener{
-            val intent = Intent(this, JournalMainActivity::class.java)
-            startActivity(intent)
-            finish()
+        editTextCaption.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                submitJournalBtn.isEnabled = s.toString().isNotEmpty()
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        submitJournalBtn.setOnClickListener {
+            val caption = editTextCaption.text.toString()
+            val resultIntent = Intent(this, JournalMainActivity::class.java).apply {
+                putExtra("selectedCountry", selectedCountry)
+                putExtra("caption", caption)
+            }
+            startActivity(resultIntent)
+            finish()  // Ensure the activity finishes after setting the result
         }
 
         // FOOTER BUTTONS, this code must be present in every activity with a footer
         cameraButton = findViewById(R.id.cameraButton)
-        cameraButton.setOnClickListener{
+        cameraButton.setOnClickListener {
             val intent = Intent(this, CameraActivity::class.java)
             startActivity(intent)
         }
@@ -78,10 +91,8 @@ class JournalSubtitleActivity : AppCompatActivity() {
         }
 
         mapButton = findViewById(R.id.mapButton)
-        mapButton.setOnClickListener{
-            TODO("Implement start of activity once MapActivity is created")
+        mapButton.setOnClickListener {
+            // Implement start of activity once MapActivity is created
         }
-
-        // END OF FOOTER BUTTONS
     }
 }

@@ -30,13 +30,14 @@ class JournalAdapter(private val countries: List<Country>) :
         private val journalCaptionTextView: TextView = itemView.findViewById(R.id.journalCaption)
 
         fun bind(country: Country) {
-            countryNameTextView.text = country.name.common
+            val countryName = country.name.common.split("\n")
+            countryNameTextView.text = countryName[0]
             if (country.flags.png.isNotEmpty()) {
                 Picasso.get().load(country.flags.png).into(countryImageView)
             } else {
                 countryImageView.setImageResource(R.drawable.placeholder) // Placeholder image if flag URL is empty
             }
-            journalCaptionTextView.text = country.name.common
+            journalCaptionTextView.text = if (countryName.size > 1) countryName[1] else ""
         }
     }
 }

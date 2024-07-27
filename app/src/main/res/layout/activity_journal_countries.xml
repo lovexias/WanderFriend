@@ -55,7 +55,7 @@
         android:id="@+id/recyclerViewCountries"
         android:layout_width="409dp"
         android:layout_height="545dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="128dp"
         android:padding="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
