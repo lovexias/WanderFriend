@@ -8,7 +8,7 @@
         <item>Country 4</item>
     </string-array>
     <string name="country_flag">Country flag</string>
-    <!-- Add the missing string resources -->
     <string name="image_desc">Image preview</string>
     <string name="take_picture">Take Picture</string>
+    <string name="mapbox_access_token">pk.eyJ1IjoiaXRzbWVreSIsImEiOiJjbHoydW4xenYxcXN3Mmpwcm9vbWExdHkxIn0.fyxzp4OndDIzofXWfkqSbg</string>
 </resources>
