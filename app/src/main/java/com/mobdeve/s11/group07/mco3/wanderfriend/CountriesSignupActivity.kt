@@ -22,7 +22,7 @@ class CountriesSignupActivity : AppCompatActivity() {
     private lateinit var fabDone: FloatingActionButton
     private lateinit var noCountryBtn: Button
     private var countriesList: List<Country> = listOf()
-    private val selectedCountries = mutableListOf<Country>()
+    private val selectedCountries = mutableSetOf<Country>()
 
     private lateinit var dbHelper: UserDatabaseHelper
 
@@ -66,7 +66,7 @@ class CountriesSignupActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     response.body()?.let { countries ->
                         countriesList = countries.sortedBy { it.name.common }
-                        countriesAdapter = CountriesAdapter(countriesList) { country, isSelected ->
+                        countriesAdapter = CountriesAdapter(countriesList, { country, isSelected ->
                             if (isSelected) {
                                 selectedCountries.add(country)
                                 Log.d("CountriesSignupActivity", "Country added: ${country.name.common}")
@@ -76,7 +76,7 @@ class CountriesSignupActivity : AppCompatActivity() {
                                 Log.d("CountriesSignupActivity", "Country removed: ${country.name.common}")
                                 Log.d("CountriesSignupActivity", "Current selected countries: ${selectedCountries.map { it.name.common }}")
                             }
-                        }
+                        }, selectedCountries)
                         recyclerViewCountries.adapter = countriesAdapter
 
                         // Add initial country if provided

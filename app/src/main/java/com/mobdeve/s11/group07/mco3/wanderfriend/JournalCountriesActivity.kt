@@ -20,7 +20,7 @@ class JournalCountriesActivity : AppCompatActivity() {
     private lateinit var backBtn: Button
     private lateinit var cancelBtn: Button
     private var countriesList: List<Country> = listOf()
-    private val selectedCountries = mutableListOf<Country>()
+    private val selectedCountries = mutableSetOf<Country>() // Use a mutable set to track selected countries
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,13 +61,13 @@ class JournalCountriesActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     response.body()?.let { countries ->
                         countriesList = countries.sortedBy { it.name.common }
-                        countriesAdapter = CountriesAdapter(countriesList) { country, isSelected ->
+                        countriesAdapter = CountriesAdapter(countriesList, { country, isSelected ->
                             if (isSelected) {
                                 selectedCountries.add(country)
                             } else {
                                 selectedCountries.remove(country)
                             }
-                        }
+                        }, selectedCountries)
                         recyclerViewCountries.adapter = countriesAdapter
                     }
                 }

@@ -11,7 +11,8 @@ import com.squareup.picasso.Picasso
 
 class CountriesAdapter(
     private var countries: List<Country>,
-    private val onCountrySelected: (Country, Boolean) -> Unit
+    private val onCountrySelected: (Country, Boolean) -> Unit,
+    private val selectedCountries: MutableSet<Country> // Pass the set of selected countries
 ) : RecyclerView.Adapter<CountriesAdapter.CountryViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CountryViewHolder {
@@ -21,7 +22,7 @@ class CountriesAdapter(
 
     override fun onBindViewHolder(holder: CountryViewHolder, position: Int) {
         val country = countries[position]
-        holder.bind(country)
+        holder.bind(country, selectedCountries.contains(country))
     }
 
     override fun getItemCount(): Int {
@@ -38,18 +39,24 @@ class CountriesAdapter(
         private val countryName: TextView = itemView.findViewById(R.id.countryName)
         private val countryCheckBox: CheckBox = itemView.findViewById(R.id.countryCheckBox)
 
-        fun bind(country: Country) {
+        fun bind(country: Country, isSelected: Boolean) {
             countryName.text = country.name.common
             if (country.flags.png.isNotEmpty()) {
                 Picasso.get().load(country.flags.png).into(countryFlag)
             } else {
                 countryFlag.setImageResource(R.drawable.placeholder) // Placeholder image if flag URL is empty
             }
+            countryCheckBox.isChecked = isSelected
 
             itemView.setOnClickListener {
-                val isSelected = countryCheckBox.isChecked
-                countryCheckBox.isChecked = !isSelected
-                onCountrySelected(country, !isSelected)
+                val newState = !countryCheckBox.isChecked
+                countryCheckBox.isChecked = newState
+                if (newState) {
+                    selectedCountries.add(country)
+                } else {
+                    selectedCountries.remove(country)
+                }
+                onCountrySelected(country, newState)
             }
         }
     }
