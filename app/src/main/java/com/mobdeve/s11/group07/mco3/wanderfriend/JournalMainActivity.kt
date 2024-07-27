@@ -2,9 +2,9 @@ package com.mobdeve.s11.group07.mco3.wanderfriend
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.widget.Button
 import android.widget.ImageButton
-import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,9 +18,11 @@ class JournalMainActivity : AppCompatActivity() {
     private lateinit var cameraButton: ImageButton
     private lateinit var journalButton: ImageButton
     private lateinit var mapButton: ImageButton
+    private lateinit var newJournalBtn: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContentView(R.layout.activity_journal_main)
 
         journalRecyclerView = findViewById(R.id.journalRecyclerView)
@@ -30,12 +32,10 @@ class JournalMainActivity : AppCompatActivity() {
 
         val user = dbHelper.getUser()
         if (user != null) {
-            Log.d("JournalMainActivity", "User data retrieved: ${user.name}, ${user.age}, ${user.country}, ${user.traveledCountries.map { it.name.common }}")
             journalAdapter = JournalAdapter(user.traveledCountries)
             journalRecyclerView.adapter = journalAdapter
         } else {
             // Handle the case when user is null
-            Toast.makeText(this, "User not found", Toast.LENGTH_SHORT).show()
         }
 
         // FOOTER BUTTONS, this code must be present in every activity with a footer
@@ -54,11 +54,14 @@ class JournalMainActivity : AppCompatActivity() {
 
         mapButton = findViewById(R.id.mapButton)
         mapButton.setOnClickListener{
-            val intent = Intent(this, MapsActivity::class.java)
-            startActivity(intent)
-            finish()
+            // Implement start of activity once MapActivity is created
         }
 
+        newJournalBtn = findViewById(R.id.newJournalBtn)
+        newJournalBtn.setOnClickListener {
+            val intent = Intent(this, JournalCountriesActivity::class.java)
+            startActivity(intent)
+        }
         // END OF FOOTER BUTTONS
     }
 }

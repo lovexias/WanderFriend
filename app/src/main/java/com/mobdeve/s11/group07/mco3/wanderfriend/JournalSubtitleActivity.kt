@@ -1,6 +1,7 @@
 package com.mobdeve.s11.group07.mco3.wanderfriend
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -9,6 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import com.squareup.picasso.Picasso
 
 class JournalSubtitleActivity : AppCompatActivity() {
 
@@ -34,6 +36,16 @@ class JournalSubtitleActivity : AppCompatActivity() {
         countryName = findViewById(R.id.countryName)
         editTextCaption = findViewById(R.id.editTextCaption)
         submitJournalBtn = findViewById(R.id.submitJournalBtn)
+
+        val selectedCountry: Country? = intent.getParcelableExtra("selectedCountry")
+        selectedCountry?.let { country ->
+            countryName.text = country.name.common
+            if (country.flags.png.isNotEmpty()) {
+                Picasso.get().load(country.flags.png).into(countryFlag)
+            } else {
+                countryFlag.setImageResource(R.drawable.placeholder) // Placeholder image if flag URL is empty
+            }
+        }
 
         backBtn.setOnClickListener{
             finish()

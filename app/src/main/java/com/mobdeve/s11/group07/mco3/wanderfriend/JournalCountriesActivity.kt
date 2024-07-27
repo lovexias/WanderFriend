@@ -14,13 +14,13 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class JournalCountriesActivity : AppCompatActivity() {
-    private lateinit var countriesAdapter: CountriesAdapter
+    private lateinit var countriesAdapter: SingleCountryAdapter
     private lateinit var recyclerViewCountries: RecyclerView
     private lateinit var searchField: EditText
     private lateinit var backBtn: Button
-    private lateinit var cancelBtn: Button
+    private lateinit var proceedBtn: Button
     private var countriesList: List<Country> = listOf()
-    private val selectedCountries = mutableSetOf<Country>() // Use a mutable set to track selected countries
+    private var selectedCountry: Country? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +29,7 @@ class JournalCountriesActivity : AppCompatActivity() {
         recyclerViewCountries = findViewById(R.id.recyclerViewCountries)
         searchField = findViewById(R.id.searchField)
         backBtn = findViewById(R.id.backBtn)
-        cancelBtn = findViewById(R.id.cancelBtn)
+        proceedBtn = findViewById(R.id.proceedBtn)
 
         recyclerViewCountries.layoutManager = LinearLayoutManager(this)
 
@@ -39,9 +39,14 @@ class JournalCountriesActivity : AppCompatActivity() {
             finish()
         }
 
-        cancelBtn.setOnClickListener {
-            val intent = Intent(this, JournalSubtitleActivity::class.java)
-            startActivity(intent)
+        proceedBtn.setOnClickListener {
+            if (selectedCountry != null) {
+                val intent = Intent(this, JournalSubtitleActivity::class.java)
+                intent.putExtra("selectedCountry", selectedCountry)
+                startActivity(intent)
+            } else {
+                // Show a message or toast to select a country
+            }
         }
 
         searchField.addTextChangedListener(object : TextWatcher {
@@ -61,13 +66,10 @@ class JournalCountriesActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     response.body()?.let { countries ->
                         countriesList = countries.sortedBy { it.name.common }
-                        countriesAdapter = CountriesAdapter(countriesList, { country, isSelected ->
-                            if (isSelected) {
-                                selectedCountries.add(country)
-                            } else {
-                                selectedCountries.remove(country)
-                            }
-                        }, selectedCountries)
+                        countriesAdapter = SingleCountryAdapter(countriesList) { country ->
+                            selectedCountry = country
+                            proceedBtn.isEnabled = true
+                        }
                         recyclerViewCountries.adapter = countriesAdapter
                     }
                 }
