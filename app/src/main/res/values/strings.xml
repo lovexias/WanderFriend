@@ -11,4 +11,5 @@
     <!-- Add the missing string resources -->
     <string name="image_desc">Image preview</string>
     <string name="take_picture">Take Picture</string>
+    <string name="google_maps_key">AIzaSyDN97yMCtfUPHFb2CtBlIwyiRDW-dovpeY</string>
 </resources>

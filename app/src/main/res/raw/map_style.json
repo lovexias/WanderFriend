@@ -1,0 +1,16 @@
+[
+  {
+    "featureType": "poi.attraction",
+    "elementType": "labels",
+    "stylers": [
+      { "visibility": "on", "color": "#D6675D" }
+    ]
+  },
+  {
+    "featureType": "poi.business",
+    "elementType": "labels",
+    "stylers": [
+      { "visibility": "on", "color": "#D6675D" }
+    ]
+  }
+]
