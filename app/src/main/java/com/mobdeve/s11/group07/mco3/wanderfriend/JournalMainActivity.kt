@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,7 +22,11 @@ class JournalMainActivity : AppCompatActivity() {
     private lateinit var mapButton: ImageButton
     private lateinit var newJournalBtn: Button
 
-    private val REQUEST_CODE_NEW_JOURNAL = 1
+    private val requestCodeNewJournal = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            handleIntent(result.data ?: Intent())
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,10 +40,13 @@ class JournalMainActivity : AppCompatActivity() {
 
         val user = dbHelper.getUser()
         if (user != null) {
-            journalAdapter = JournalAdapter(user.traveledCountries)
+            journalAdapter = JournalAdapter(user.traveledCountries) { country ->
+                val intent = Intent(this, JournalActivity::class.java)
+                intent.putExtra("selectedCountry", country)
+                startActivity(intent)
+            }
             journalRecyclerView.adapter = journalAdapter
         } else {
-            // Handle the case when user is null
             Toast.makeText(this, "User not found", Toast.LENGTH_SHORT).show()
         }
 
@@ -64,10 +72,9 @@ class JournalMainActivity : AppCompatActivity() {
         newJournalBtn = findViewById(R.id.newJournalBtn)
         newJournalBtn.setOnClickListener {
             val intent = Intent(this, JournalCountriesActivity::class.java)
-            startActivityForResult(intent, REQUEST_CODE_NEW_JOURNAL)
+            requestCodeNewJournal.launch(intent)
         }
 
-        // Check if an intent has been passed to handle new journal entry
         handleIntent(intent)
     }
 
@@ -83,16 +90,13 @@ class JournalMainActivity : AppCompatActivity() {
                 }
                 val updatedUser = it.copy(traveledCountries = updatedTraveledCountries)
                 dbHelper.addUser(updatedUser)
-                journalAdapter = JournalAdapter(updatedUser.traveledCountries)
+                journalAdapter = JournalAdapter(updatedUser.traveledCountries) { country ->
+                    val intent = Intent(this, JournalActivity::class.java)
+                    intent.putExtra("selectedCountry", country)
+                    startActivity(intent)
+                }
                 journalRecyclerView.adapter = journalAdapter
             }
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_NEW_JOURNAL && resultCode == RESULT_OK) {
-            handleIntent(data ?: Intent())
         }
     }
 }

@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-
 class JournalActivity : AppCompatActivity() {
 
     private lateinit var backBtn: Button
@@ -30,22 +29,20 @@ class JournalActivity : AppCompatActivity() {
         newLogBtn = findViewById(R.id.newLogBtn)
 
         val gridLayoutManager = GridLayoutManager(this, 2)
-        recyclerViewLogs.setLayoutManager(gridLayoutManager)
+        recyclerViewLogs.layoutManager = gridLayoutManager
 
         backBtn.setOnClickListener {
-            val intent = Intent(this, JournalMainActivity::class.java)
-            startActivity(intent)
             finish()
         }
 
-        newLogBtn.setOnClickListener{
+        newLogBtn.setOnClickListener {
             val intent = Intent(this, NewLogOptionsActivity::class.java)
             startActivity(intent)
         }
 
         // FOOTER BUTTONS, this code must be present in every activity with a footer
         cameraButton = findViewById(R.id.cameraButton)
-        cameraButton.setOnClickListener{
+        cameraButton.setOnClickListener {
             val intent = Intent(this, CameraActivity::class.java)
             startActivity(intent)
         }
@@ -58,11 +55,15 @@ class JournalActivity : AppCompatActivity() {
         }
 
         mapButton = findViewById(R.id.mapButton)
-        mapButton.setOnClickListener{
-            TODO("Implement start of activity once MapActivity is created")
+        mapButton.setOnClickListener {
+            // Implement start of activity once MapActivity is created
         }
 
-        // END OF FOOTER BUTTONS
-
+        // At this point, you may want to implement logic to handle the country logs
+        // The `selectedCountry` object can be retrieved if needed for future use
+        val selectedCountry: Country? = intent.getParcelableExtra("selectedCountry")
+        selectedCountry?.let {
+            // Use the selectedCountry data if needed in the future
+        }
     }
 }
