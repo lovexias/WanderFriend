@@ -2,20 +2,16 @@ package com.mobdeve.s11.group07.mco3.wanderfriend
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.google.gson.annotations.SerializedName
 
-data class Country(
-    @SerializedName("name")
-    val name: Name,
-    @SerializedName("flags")
-    val flags: Flags
-) : Parcelable {
+data class Country(val id: Long, val name: Name, val flags: Flags) : Parcelable {
     constructor(parcel: Parcel) : this(
+        parcel.readLong(),
         parcel.readParcelable(Name::class.java.classLoader)!!,
         parcel.readParcelable(Flags::class.java.classLoader)!!
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeLong(id)
         parcel.writeParcelable(name, flags)
         parcel.writeParcelable(this.flags, flags)
     }
@@ -35,11 +31,8 @@ data class Country(
     }
 }
 
-data class Name(
-    @SerializedName("common")
-    val common: String
-) : Parcelable {
-    constructor(parcel: Parcel) : this(parcel.readString() ?: "")
+data class Name(val common: String) : Parcelable {
+    constructor(parcel: Parcel) : this(parcel.readString()!!)
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(common)
@@ -60,11 +53,8 @@ data class Name(
     }
 }
 
-data class Flags(
-    @SerializedName("png")
-    val png: String
-) : Parcelable {
-    constructor(parcel: Parcel) : this(parcel.readString() ?: "")
+data class Flags(val png: String) : Parcelable {
+    constructor(parcel: Parcel) : this(parcel.readString()!!)
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(png)

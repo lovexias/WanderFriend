@@ -11,17 +11,43 @@ import com.google.gson.reflect.TypeToken
 class UserDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     override fun onCreate(db: SQLiteDatabase) {
-        val createTableStatement = "CREATE TABLE $TABLE_USERS (" +
-                "$COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "$COLUMN_NAME TEXT, " +
-                "$COLUMN_AGE INTEGER, " +
-                "$COLUMN_COUNTRY TEXT, " +
-                "$COLUMN_TRAVELED_COUNTRIES TEXT)"
-        db.execSQL(createTableStatement)
+        val createUsersTableStatement = """
+            CREATE TABLE $TABLE_USERS (
+                $COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT, 
+                $COLUMN_NAME TEXT, 
+                $COLUMN_AGE INTEGER, 
+                $COLUMN_COUNTRY TEXT, 
+                $COLUMN_TRAVELED_COUNTRIES TEXT
+            )
+        """
+        db.execSQL(createUsersTableStatement)
+
+        val createCountryTableStatement = """
+            CREATE TABLE $TABLE_COUNTRIES (
+                $COLUMN_COUNTRY_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $COLUMN_COUNTRY_NAME TEXT,
+                $COLUMN_COUNTRY_FLAGS TEXT
+            )
+        """
+        db.execSQL(createCountryTableStatement)
+
+        val createCountryLogTableStatement = """
+            CREATE TABLE $TABLE_COUNTRY_LOG (
+                $COLUMN_LOG_ID INTEGER PRIMARY KEY AUTOINCREMENT, 
+                $COLUMN_LOG_COUNTRY_ID INTEGER, 
+                $COLUMN_LOG_DATE TEXT, 
+                $COLUMN_LOG_CAPTION TEXT, 
+                $COLUMN_LOG_PHOTO_URI TEXT,
+                FOREIGN KEY($COLUMN_LOG_COUNTRY_ID) REFERENCES $TABLE_COUNTRIES($COLUMN_COUNTRY_ID)
+            )
+        """
+        db.execSQL(createCountryLogTableStatement)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         db.execSQL("DROP TABLE IF EXISTS $TABLE_USERS")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_COUNTRIES")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_COUNTRY_LOG")
         onCreate(db)
     }
 
@@ -77,6 +103,51 @@ class UserDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         }
     }
 
+    fun addLog(log: CountryLog, countryId: Long): Boolean {
+        val db = this.writableDatabase
+        return try {
+            val values = ContentValues().apply {
+                put(COLUMN_LOG_COUNTRY_ID, countryId)
+                put(COLUMN_LOG_DATE, log.date)
+                put(COLUMN_LOG_CAPTION, log.caption)
+                put(COLUMN_LOG_PHOTO_URI, log.photoUri)
+            }
+            val success = db.insert(TABLE_COUNTRY_LOG, null, values)
+            Log.d("UserDatabaseHelper", "Log added: $log, Success: $success")
+            success != -1L
+        } catch (e: Exception) {
+            Log.e("UserDatabaseHelper", "Error adding log", e)
+            false
+        } finally {
+            db.close()
+        }
+    }
+
+    fun getLogsForCountry(countryId: Long): List<CountryLog> {
+        val db = this.readableDatabase
+        val logs = mutableListOf<CountryLog>()
+        return try {
+            val query = "SELECT * FROM $TABLE_COUNTRY_LOG WHERE $COLUMN_LOG_COUNTRY_ID = ?"
+            val cursor = db.rawQuery(query, arrayOf(countryId.toString()))
+            if (cursor.moveToFirst()) {
+                do {
+                    val id = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_LOG_ID))
+                    val date = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LOG_DATE))
+                    val caption = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LOG_CAPTION))
+                    val photoUri = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LOG_PHOTO_URI))
+                    logs.add(CountryLog(id, countryId, date, caption, photoUri))
+                } while (cursor.moveToNext())
+            }
+            cursor.close()
+            logs
+        } catch (e: Exception) {
+            Log.e("UserDatabaseHelper", "Error retrieving logs", e)
+            logs
+        } finally {
+            db.close()
+        }
+    }
+
     private fun isUserExists(db: SQLiteDatabase): Boolean {
         val query = "SELECT * FROM $TABLE_USERS"
         val cursor = db.rawQuery(query, null)
@@ -86,7 +157,7 @@ class UserDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
     }
 
     companion object {
-        private const val DATABASE_VERSION = 35
+        private const val DATABASE_VERSION = 41
         private const val DATABASE_NAME = "userDatabase"
         const val TABLE_USERS = "users"
         const val COLUMN_ID = "id"
@@ -94,5 +165,17 @@ class UserDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         const val COLUMN_AGE = "age"
         const val COLUMN_COUNTRY = "country"
         const val COLUMN_TRAVELED_COUNTRIES = "traveledCountries"
+
+        const val TABLE_COUNTRIES = "countries"
+        const val COLUMN_COUNTRY_ID = "countryId"
+        const val COLUMN_COUNTRY_NAME = "countryName"
+        const val COLUMN_COUNTRY_FLAGS = "countryFlags"
+
+        const val TABLE_COUNTRY_LOG = "CountryLog"
+        const val COLUMN_LOG_ID = "logId"
+        const val COLUMN_LOG_COUNTRY_ID = "logCountryId"
+        const val COLUMN_LOG_DATE = "logDate"
+        const val COLUMN_LOG_CAPTION = "logCaption"
+        const val COLUMN_LOG_PHOTO_URI = "logPhotoUri"
     }
 }

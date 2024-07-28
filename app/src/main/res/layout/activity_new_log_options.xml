@@ -20,7 +20,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/uploadPhoto"
+        android:id="@+id/uploadPhotoBtn"
         android:layout_width="320dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="100dp"
@@ -35,7 +35,7 @@
         app:layout_constraintTop_toBottomOf="@+id/backBtn" />
 
     <Button
-        android:id="@+id/takePhoto"
+        android:id="@+id/takePhotoBtn"
         android:layout_width="320dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="100dp"
@@ -47,7 +47,7 @@
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/uploadPhoto" />
+        app:layout_constraintTop_toBottomOf="@+id/uploadPhotoBtn" />
 
     <include
         android:id="@+id/footer"

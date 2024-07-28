@@ -12,4 +12,9 @@
     <string name="image_desc">Image preview</string>
     <string name="take_picture">Take Picture</string>
     <string name="google_maps_key">AIzaSyDN97yMCtfUPHFb2CtBlIwyiRDW-dovpeY</string>
+    <string name="date_format">%02d/%02d/%d</string>
+    <string name="error_saving_log">Error saving log. Please try again.</string>
+    <string name="all_fields_must_be_filled">All fields must be filled up</string>
+
+
 </resources>

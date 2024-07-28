@@ -2,11 +2,10 @@ package com.mobdeve.s11.group07.mco3.wanderfriend
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
-import android.widget.ImageButton
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 class JournalActivity : AppCompatActivity() {
@@ -15,55 +14,54 @@ class JournalActivity : AppCompatActivity() {
     private lateinit var newLogBtn: Button
     private lateinit var recyclerViewLogs: RecyclerView
 
-    private lateinit var cameraButton: ImageButton
-    private lateinit var journalButton: ImageButton
-    private lateinit var mapButton: ImageButton
+    private var selectedCountry: Country? = null
+    private lateinit var userDatabaseHelper: UserDatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_journal)
 
-        recyclerViewLogs = findViewById(R.id.recyclerViewLogs)
         backBtn = findViewById(R.id.backBtn)
         newLogBtn = findViewById(R.id.newLogBtn)
+        recyclerViewLogs = findViewById(R.id.recyclerViewLogs)
 
-        val gridLayoutManager = GridLayoutManager(this, 2)
-        recyclerViewLogs.layoutManager = gridLayoutManager
+        userDatabaseHelper = UserDatabaseHelper(this)
+
+        selectedCountry = intent.getParcelableExtra("selectedCountry")
 
         backBtn.setOnClickListener {
-            finish()
-        }
-
-        newLogBtn.setOnClickListener {
-            val intent = Intent(this, NewLogOptionsActivity::class.java)
-            startActivity(intent)
-        }
-
-        // FOOTER BUTTONS, this code must be present in every activity with a footer
-        cameraButton = findViewById(R.id.cameraButton)
-        cameraButton.setOnClickListener {
-            val intent = Intent(this, CameraActivity::class.java)
-            startActivity(intent)
-        }
-
-        journalButton = findViewById(R.id.journalButton)
-        journalButton.setOnClickListener {
             val intent = Intent(this, JournalMainActivity::class.java)
             startActivity(intent)
             finish()
         }
 
-        mapButton = findViewById(R.id.mapButton)
-        mapButton.setOnClickListener {
-            // Implement start of activity once MapActivity is created
+        newLogBtn.setOnClickListener {
+            val intent = Intent(this, NewLogOptionsActivity::class.java).apply {
+                putExtra("selectedCountry", selectedCountry)
+            }
+            startActivity(intent)
         }
 
-        // At this point, you may want to implement logic to handle the country logs
-        // The `selectedCountry` object can be retrieved if needed for future use
-        val selectedCountry: Country? = intent.getParcelableExtra("selectedCountry")
-        selectedCountry?.let {
-            // Use the selectedCountry data if needed in the future
+        loadLogsForCountry()
+    }
+
+    private fun loadLogsForCountry() {
+        selectedCountry?.let { country ->
+            val logs = userDatabaseHelper.getLogsForCountry(country.id)
+            logs.forEach { log ->
+                Log.d("JournalActivity", "Log photo URI: ${log.photoUri}")
+            }
+            recyclerViewLogs.layoutManager = LinearLayoutManager(this)
+            recyclerViewLogs.adapter = LogsAdapter(logs)
+            scrollToBottom()
+        } ?: run {
+            Log.e("JournalActivity", "Selected country is null")
+        }
+    }
+
+    private fun scrollToBottom() {
+        recyclerViewLogs.post {
+            recyclerViewLogs.scrollToPosition(recyclerViewLogs.adapter?.itemCount?.minus(1) ?: 0)
         }
     }
 }
