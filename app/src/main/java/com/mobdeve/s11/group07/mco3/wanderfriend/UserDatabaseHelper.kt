@@ -198,6 +198,25 @@ class UserDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         }
     }
 
+
+    fun getAllCountries(): List<Country> {
+        val db = this.readableDatabase
+        val countries = mutableListOf<Country>()
+        val query = "SELECT * FROM $TABLE_COUNTRIES"
+        val cursor = db.rawQuery(query, null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                val countryId = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_COUNTRY_ID))
+                val name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_COUNTRY_NAME))
+                val flags = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_COUNTRY_FLAGS))
+                countries.add(Country(countryId, Name(name), Flags(flags)))
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return countries
+    }
+
     private fun isUserExists(db: SQLiteDatabase): Boolean {
         val query = "SELECT * FROM $TABLE_USERS"
         val cursor = db.rawQuery(query, null)
@@ -207,7 +226,7 @@ class UserDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
     }
 
     companion object {
-        private const val DATABASE_VERSION = 49
+        private const val DATABASE_VERSION = 52
         private const val DATABASE_NAME = "userDatabase"
         const val TABLE_USERS = "users"
         const val COLUMN_ID = "id"

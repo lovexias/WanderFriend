@@ -21,18 +21,25 @@ class CameraDoneActivity : AppCompatActivity() {
         storeButton = findViewById(R.id.storeBtn)
         discardButton = findViewById(R.id.discardBtn)
 
-        // Assuming the photo is passed as a URI string in the intent
+        // Get the photo URI from the Intent
         val photoUri = intent.getStringExtra("photoUri")
         photoUri?.let {
             photoView.setImageURI(Uri.parse(it))
         }
 
+        // Set click listener for the store button
         storeButton.setOnClickListener {
-            // Handle storing the photo in a journal
+            // Redirect to StoreJournalActivity and pass the photo URI
+            val intent = Intent(this, StoreJournalActivity::class.java).apply {
+                putExtra("photoUri", photoUri) // Pass the photo URI to the StoreJournalActivity
+            }
+            startActivity(intent)
         }
 
+        // Set click listener for the discard button
         discardButton.setOnClickListener {
-            // Handle discarding the photo
+            // Handle discarding the photo (e.g., return to previous screen or close activity)
+            finish()
         }
     }
 }
