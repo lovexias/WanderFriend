@@ -27,6 +27,7 @@ class JournalActivity : AppCompatActivity() {
 
         userDatabaseHelper = UserDatabaseHelper(this)
 
+        // Retrieve the selected country from the intent
         selectedCountry = intent.getParcelableExtra("selectedCountry")
 
         backBtn.setOnClickListener {
@@ -42,15 +43,20 @@ class JournalActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        // Load logs for the selected country
         loadLogsForCountry()
     }
 
     private fun loadLogsForCountry() {
+        // Ensure the selected country is not null
         selectedCountry?.let { country ->
-            val logs = userDatabaseHelper.getLogsForCountry(country.id)
+            // Retrieve logs for the specific country using its ID
+            val logs = userDatabaseHelper.getLogsForCountry(country.countryId) // Use country.countryId
+            Log.d("JournalActivity", "Retrieved ${logs.size} logs for Country ID: ${country.countryId}")  // Debug log
             logs.forEach { log ->
-                Log.d("JournalActivity", "Log photo URI: ${log.photoUri}")
+                Log.d("JournalActivity", "Log ID: ${log.logId}, Date: ${log.date}, Caption: ${log.caption}, Photo URI: ${log.photoUri}")
             }
+            // Set up the RecyclerView to display logs
             recyclerViewLogs.layoutManager = LinearLayoutManager(this)
             recyclerViewLogs.adapter = LogsAdapter(logs)
             scrollToBottom()
@@ -59,6 +65,7 @@ class JournalActivity : AppCompatActivity() {
         }
     }
 
+    // Helper function to scroll the RecyclerView to the bottom
     private fun scrollToBottom() {
         recyclerViewLogs.post {
             recyclerViewLogs.scrollToPosition(recyclerViewLogs.adapter?.itemCount?.minus(1) ?: 0)

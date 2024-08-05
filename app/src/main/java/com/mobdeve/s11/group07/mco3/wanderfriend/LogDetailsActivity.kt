@@ -80,10 +80,12 @@ class LogDetailsActivity : AppCompatActivity() {
         photoUri = intent.getStringExtra("photoUri")
         selectedCountry = intent.getParcelableExtra("selectedCountry")
 
+        // Make sure the selectedCountry is not null
         selectedCountry?.let {
-            Log.d("LogDetailsActivity", "Received selectedCountry: ${it.name.common}")
+            Log.d("LogDetailsActivity", "Received selectedCountry: ${it.name.common}, countryId: ${it.countryId}")
         }
 
+        // Load photo URI into ImageView
         photoUri?.let {
             Log.d("LogDetailsActivity", "Received photoUri: $it")
             Picasso.get().load(Uri.parse(it)).into(logPhoto)
@@ -123,15 +125,22 @@ class LogDetailsActivity : AppCompatActivity() {
 
         Log.d("LogDetailsActivity", "Saving log details - Date: $date, Caption: $caption, Photo URI: $photoUri")
 
+        // Ensure selectedCountry is not null and add log with the correct country ID
         selectedCountry?.let { country ->
-            val log = CountryLog(0, country.id, date, caption, photoUri!!)
             val databaseHelper = UserDatabaseHelper(this)
-            val success = databaseHelper.addLog(log, country.id)
+
+            // Ensure the country is in the Country table and get its ID
+            val storedCountry = databaseHelper.getCountryByName(country.name.common)
+            val countryId = storedCountry?.countryId ?: databaseHelper.addOrUpdateCountry(country)
+
+            val log = CountryLog(0, countryId, date, caption, photoUri!!) // Use countryId from the database
+            Log.d("LogDetailsActivity", "Log to be added: $log with Country ID: $countryId")  // Debug log
+            val success = databaseHelper.addLog(log)
 
             if (success) {
                 Log.d("LogDetailsActivity", "Log saved successfully")
                 val intent = Intent(this, JournalActivity::class.java).apply {
-                    putExtra("selectedCountry", country)
+                    putExtra("selectedCountry", storedCountry ?: country.copy(countryId = countryId))
                 }
                 startActivity(intent)
                 finish()

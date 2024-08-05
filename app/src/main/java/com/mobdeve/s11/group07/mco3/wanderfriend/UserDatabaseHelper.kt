@@ -2,6 +2,7 @@ package com.mobdeve.s11.group07.mco3.wanderfriend
 
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
@@ -24,7 +25,7 @@ class UserDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
 
         val createCountryTableStatement = """
             CREATE TABLE $TABLE_COUNTRIES (
-                $COLUMN_COUNTRY_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $COLUMN_COUNTRY_ID INTEGER PRIMARY KEY AUTOINCREMENT,  -- PK for Country
                 $COLUMN_COUNTRY_NAME TEXT,
                 $COLUMN_COUNTRY_FLAGS TEXT
             )
@@ -33,12 +34,12 @@ class UserDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
 
         val createCountryLogTableStatement = """
             CREATE TABLE $TABLE_COUNTRY_LOG (
-                $COLUMN_LOG_ID INTEGER PRIMARY KEY AUTOINCREMENT, 
-                $COLUMN_LOG_COUNTRY_ID INTEGER, 
+                $COLUMN_LOG_ID INTEGER PRIMARY KEY AUTOINCREMENT,  -- PK for Log
+                $COLUMN_LOG_COUNTRY_ID INTEGER,  -- FK referencing CountryID
                 $COLUMN_LOG_DATE TEXT, 
                 $COLUMN_LOG_CAPTION TEXT, 
                 $COLUMN_LOG_PHOTO_URI TEXT,
-                FOREIGN KEY($COLUMN_LOG_COUNTRY_ID) REFERENCES $TABLE_COUNTRIES($COLUMN_COUNTRY_ID)
+                FOREIGN KEY($COLUMN_LOG_COUNTRY_ID) REFERENCES $TABLE_COUNTRIES($COLUMN_COUNTRY_ID)  -- Foreign Key Constraint
             )
         """
         db.execSQL(createCountryLogTableStatement)
@@ -54,6 +55,11 @@ class UserDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
     fun addUser(user: User): Boolean {
         val db = this.writableDatabase
         return try {
+            // Add traveled countries to the Country table
+            user.traveledCountries.forEach { country ->
+                addOrUpdateCountry(country)
+            }
+
             val values = ContentValues().apply {
                 put(COLUMN_NAME, user.name)
                 put(COLUMN_AGE, user.age)
@@ -103,17 +109,58 @@ class UserDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         }
     }
 
-    fun addLog(log: CountryLog, countryId: Long): Boolean {
+    // Add or update country in the Country table
+    fun addOrUpdateCountry(country: Country): Long {
+        val db = this.writableDatabase
+        val existingCountry = getCountryByName(country.name.common)
+
+        // If the country already exists, update it
+        if (existingCountry != null) {
+            Log.d("UserDatabaseHelper", "Country already exists: ${country.name.common}")
+            return existingCountry.countryId
+        }
+
+        // Otherwise, insert the new country
+        val values = ContentValues().apply {
+            put(COLUMN_COUNTRY_NAME, country.name.common)
+            put(COLUMN_COUNTRY_FLAGS, country.flags.png)
+        }
+
+        val countryId = db.insert(TABLE_COUNTRIES, null, values)
+        Log.d("UserDatabaseHelper", "Country added: ${country.name.common} with Country ID: $countryId")
+        return countryId
+    }
+
+    // Retrieve a country by name from the Country table
+    fun getCountryByName(countryName: String): Country? {
+        val db = this.readableDatabase
+        val query = "SELECT * FROM $TABLE_COUNTRIES WHERE $COLUMN_COUNTRY_NAME = ?"
+        val cursor: Cursor = db.rawQuery(query, arrayOf(countryName))
+        return if (cursor.moveToFirst()) {
+            val countryId = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_COUNTRY_ID))
+            val name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_COUNTRY_NAME))
+            val flags = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_COUNTRY_FLAGS))
+            cursor.close()
+            Country(countryId, Name(name), Flags(flags))
+        } else {
+            cursor.close()
+            null
+        }
+    }
+
+    // Ensure that the log is associated with the correct country ID
+    fun addLog(log: CountryLog): Boolean {
         val db = this.writableDatabase
         return try {
             val values = ContentValues().apply {
-                put(COLUMN_LOG_COUNTRY_ID, countryId)
+                put(COLUMN_LOG_COUNTRY_ID, log.countryId)  // Use the countryId as foreign key
                 put(COLUMN_LOG_DATE, log.date)
                 put(COLUMN_LOG_CAPTION, log.caption)
                 put(COLUMN_LOG_PHOTO_URI, log.photoUri)
             }
             val success = db.insert(TABLE_COUNTRY_LOG, null, values)
             Log.d("UserDatabaseHelper", "Log added: $log, Success: $success")
+            Log.d("UserDatabaseHelper", "Log added with countryId: ${log.countryId}")  // Debug log
             success != -1L
         } catch (e: Exception) {
             Log.e("UserDatabaseHelper", "Error adding log", e)
@@ -123,12 +170,14 @@ class UserDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         }
     }
 
+    // Retrieve logs specifically for the given country ID
     fun getLogsForCountry(countryId: Long): List<CountryLog> {
         val db = this.readableDatabase
         val logs = mutableListOf<CountryLog>()
         return try {
             val query = "SELECT * FROM $TABLE_COUNTRY_LOG WHERE $COLUMN_LOG_COUNTRY_ID = ?"
-            val cursor = db.rawQuery(query, arrayOf(countryId.toString()))
+            val cursor = db.rawQuery(query, arrayOf(countryId.toString()))  // Query by countryId
+            Log.d("UserDatabaseHelper", "Fetching logs for countryId: $countryId")  // Debug log
             if (cursor.moveToFirst()) {
                 do {
                     val id = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_LOG_ID))
@@ -136,6 +185,7 @@ class UserDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
                     val caption = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LOG_CAPTION))
                     val photoUri = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LOG_PHOTO_URI))
                     logs.add(CountryLog(id, countryId, date, caption, photoUri))
+                    Log.d("UserDatabaseHelper", "Retrieved Log ID: $id for Country ID: $countryId")  // Debug log
                 } while (cursor.moveToNext())
             }
             cursor.close()
@@ -157,7 +207,7 @@ class UserDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
     }
 
     companion object {
-        private const val DATABASE_VERSION = 41
+        private const val DATABASE_VERSION = 49
         private const val DATABASE_NAME = "userDatabase"
         const val TABLE_USERS = "users"
         const val COLUMN_ID = "id"

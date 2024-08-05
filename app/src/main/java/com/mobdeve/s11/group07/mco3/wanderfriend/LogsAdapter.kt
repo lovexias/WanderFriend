@@ -20,7 +20,7 @@ class LogsAdapter(private val logs: List<CountryLog>) : RecyclerView.Adapter<Log
         fun bind(log: CountryLog) {
             logDate.text = log.date
             logCaption.text = log.caption
-            Log.d("LogsAdapter", "Loading image URI: ${log.photoUri}")
+            Log.d("LogsAdapter", "Binding Log ID: ${log.logId}, Country ID: ${log.countryId}, Caption: ${log.caption}")  // Debug log
             try {
                 Picasso.get().load(Uri.parse(log.photoUri)).into(logPhoto)
             } catch (e: SecurityException) {

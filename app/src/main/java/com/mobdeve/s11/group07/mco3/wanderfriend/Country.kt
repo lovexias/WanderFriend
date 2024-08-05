@@ -3,15 +3,20 @@ package com.mobdeve.s11.group07.mco3.wanderfriend
 import android.os.Parcel
 import android.os.Parcelable
 
-data class Country(val id: Long, val name: Name, val flags: Flags) : Parcelable {
+// Country model now includes CountryID as a primary key
+data class Country(
+    val countryId: Long,  // Primary Key
+    val name: Name,
+    val flags: Flags
+) : Parcelable {
     constructor(parcel: Parcel) : this(
-        parcel.readLong(),
+        parcel.readLong(),  // Reading countryId from Parcel
         parcel.readParcelable(Name::class.java.classLoader)!!,
         parcel.readParcelable(Flags::class.java.classLoader)!!
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeLong(id)
+        parcel.writeLong(countryId)  // Writing countryId to Parcel
         parcel.writeParcelable(name, flags)
         parcel.writeParcelable(this.flags, flags)
     }

@@ -2,6 +2,7 @@ package com.mobdeve.s11.group07.mco3.wanderfriend
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.Toast
@@ -40,9 +41,21 @@ class JournalMainActivity : AppCompatActivity() {
 
         val user = dbHelper.getUser()
         if (user != null) {
+            // Add countries to the Country table and ensure they have IDs
+            user.traveledCountries.forEach { country ->
+                val storedCountry = dbHelper.getCountryByName(country.name.common)
+                val countryId = storedCountry?.countryId ?: dbHelper.addOrUpdateCountry(country)
+                Log.d("JournalMainActivity", "Ensuring country in database: ${country.name.common}, Country ID: $countryId")
+            }
+
+            // Set up the adapter with traveled countries and handle country selection
             journalAdapter = JournalAdapter(user.traveledCountries) { country ->
+                val storedCountry = dbHelper.getCountryByName(country.name.common)
+                val countryId = storedCountry?.countryId ?: dbHelper.addOrUpdateCountry(country)
+
                 val intent = Intent(this, JournalActivity::class.java)
-                intent.putExtra("selectedCountry", country)
+                intent.putExtra("selectedCountry", country.copy(countryId = countryId))
+                Log.d("JournalMainActivity", "Navigating to JournalActivity with Country: ${country.name.common}, Country ID: $countryId")  // Debug log
                 startActivity(intent)
             }
             journalRecyclerView.adapter = journalAdapter
@@ -75,9 +88,11 @@ class JournalMainActivity : AppCompatActivity() {
             requestCodeNewJournal.launch(intent)
         }
 
+        // Handle incoming intents
         handleIntent(intent)
     }
 
+    // Handle intent for selecting a country and caption
     private fun handleIntent(intent: Intent) {
         val selectedCountry: Country? = intent.getParcelableExtra("selectedCountry")
         val caption: String? = intent.getStringExtra("caption")
