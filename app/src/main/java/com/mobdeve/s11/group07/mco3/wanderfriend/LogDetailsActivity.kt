@@ -10,6 +10,7 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.squareup.picasso.Picasso
 import java.util.*
@@ -34,6 +35,7 @@ class LogDetailsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_log_details)
 
+        // Initialize views
         backBtn = findViewById(R.id.backBtn)
         logPhoto = findViewById(R.id.logPhoto)
         dateInput = findViewById(R.id.dateInput)
@@ -41,10 +43,12 @@ class LogDetailsActivity : AppCompatActivity() {
         errorMessage = findViewById(R.id.errorMessage)
         submitBtn = findViewById(R.id.submitBtn)
 
+        // Set up back button functionality
         backBtn.setOnClickListener {
             finish()
         }
 
+        // Set up submit button functionality
         submitBtn.setOnClickListener {
             if (validateInputs()) {
                 saveLogDetails()
@@ -71,31 +75,48 @@ class LogDetailsActivity : AppCompatActivity() {
 
         mapButton = findViewById(R.id.mapButton)
         mapButton.setOnClickListener {
-            TODO("Implement start of activity once MapActivity is created")
+            // Implement start of activity once MapActivity is created
         }
 
-        // END OF FOOTER BUTTONS
+        // Initialize photo and selected country data
+        initializeData()
 
-        // Handle received data
-        photoUri = intent.getStringExtra("photoUri")
-        selectedCountry = intent.getParcelableExtra("selectedCountry")
-
-        // Make sure the selectedCountry is not null
-        selectedCountry?.let {
-            Log.d("LogDetailsActivity", "Received selectedCountry: ${it.name.common}, countryId: ${it.countryId}")
-        }
-
-        // Load photo URI into ImageView
-        photoUri?.let {
-            Log.d("LogDetailsActivity", "Received photoUri: $it")
-            Picasso.get().load(Uri.parse(it)).into(logPhoto)
-        }
-
+        // Set up date picker
         dateInput.setOnClickListener {
             showDatePickerDialog()
         }
     }
 
+    /**
+     * Initialize the photo URI and selected country data.
+     */
+    private fun initializeData() {
+        photoUri = intent.getStringExtra("photoUri")
+        selectedCountry = intent.getParcelableExtra("selectedCountry")
+
+        selectedCountry?.let {
+            Log.d("LogDetailsActivity", "Received selectedCountry: ${it.name.common}")
+
+            photoUri?.let { uriString ->
+                Log.d("LogDetailsActivity", "Received photoUri: $uriString")
+                val uri = Uri.parse(uriString)
+                grantUriPermission(packageName, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                Picasso.get().load(uri).into(logPhoto)
+            } ?: run {
+                Log.e("LogDetailsActivity", "Photo URI is null")
+                errorMessage.text = "Error: Photo URI is null"
+                errorMessage.visibility = TextView.VISIBLE
+            }
+        } ?: run {
+            Log.e("LogDetailsActivity", "Selected country is null")
+            errorMessage.text = "Error: Selected country is null"
+            errorMessage.visibility = TextView.VISIBLE
+        }
+    }
+
+    /**
+     * Show a date picker dialog for selecting the log date.
+     */
     private fun showDatePickerDialog() {
         val calendar = Calendar.getInstance()
         val year = calendar.get(Calendar.YEAR)
@@ -103,12 +124,16 @@ class LogDetailsActivity : AppCompatActivity() {
         val day = calendar.get(Calendar.DAY_OF_MONTH)
 
         val datePickerDialog = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
-            dateInput.setText(getString(R.string.date_format, selectedDay, selectedMonth + 1, selectedYear))
+            dateInput.setText("$selectedDay/${selectedMonth + 1}/$selectedYear")
         }, year, month, day)
 
         datePickerDialog.show()
     }
 
+    /**
+     * Validate input fields before saving log details.
+     * @return true if all inputs are valid, false otherwise
+     */
     private fun validateInputs(): Boolean {
         val isDateFilled = dateInput.text.toString().isNotEmpty()
         val isCaptionFilled = editTextCaption.text.toString().isNotEmpty()
@@ -119,28 +144,31 @@ class LogDetailsActivity : AppCompatActivity() {
         return isDateFilled && isCaptionFilled && isPhotoUriValid
     }
 
+    /**
+     * Save the log details into the database.
+     */
     private fun saveLogDetails() {
         val date = dateInput.text.toString()
         val caption = editTextCaption.text.toString()
 
         Log.d("LogDetailsActivity", "Saving log details - Date: $date, Caption: $caption, Photo URI: $photoUri")
 
-        // Ensure selectedCountry is not null and add log with the correct country ID
         selectedCountry?.let { country ->
+            val log = CountryLog(
+                logId = 0,  // Use the correct parameter name for logId
+                countryId = country.countryId,  // Ensure you have this property in the Country model
+                date = date,
+                caption = caption,
+                photoUri = photoUri!!
+            )
             val databaseHelper = UserDatabaseHelper(this)
-
-            // Ensure the country is in the Country table and get its ID
-            val storedCountry = databaseHelper.getCountryByName(country.name.common)
-            val countryId = storedCountry?.countryId ?: databaseHelper.addOrUpdateCountry(country)
-
-            val log = CountryLog(0, countryId, date, caption, photoUri!!) // Use countryId from the database
-            Log.d("LogDetailsActivity", "Log to be added: $log with Country ID: $countryId")  // Debug log
             val success = databaseHelper.addLog(log)
 
             if (success) {
                 Log.d("LogDetailsActivity", "Log saved successfully")
+                Toast.makeText(this, "Log saved successfully!", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this, JournalActivity::class.java).apply {
-                    putExtra("selectedCountry", storedCountry ?: country.copy(countryId = countryId))
+                    putExtra("selectedCountry", country)
                 }
                 startActivity(intent)
                 finish()

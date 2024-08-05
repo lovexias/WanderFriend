@@ -1,7 +1,9 @@
 package com.mobdeve.s11.group07.mco3.wanderfriend
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
@@ -9,7 +11,10 @@ import android.provider.MediaStore
 import android.util.Log
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 class NewLogOptionsActivity : AppCompatActivity() {
 
@@ -30,6 +35,9 @@ class NewLogOptionsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_log_options)
 
+        // Request permissions at the start
+        requestPermissions()
+
         backBtn = findViewById(R.id.backBtn)
         uploadPhotoBtn = findViewById(R.id.uploadPhotoBtn)
         takePhotoBtn = findViewById(R.id.takePhotoBtn)
@@ -42,8 +50,16 @@ class NewLogOptionsActivity : AppCompatActivity() {
         }
 
         takePhotoBtn.setOnClickListener {
-            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            startActivityForResult(intent, TAKE_PHOTO_REQUEST)
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                startActivityForResult(intent, TAKE_PHOTO_REQUEST)
+            } else {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.CAMERA),
+                    TAKE_PHOTO_REQUEST
+                )
+            }
         }
 
         backBtn.setOnClickListener {
@@ -66,7 +82,45 @@ class NewLogOptionsActivity : AppCompatActivity() {
 
         mapButton = findViewById(R.id.mapButton)
         mapButton.setOnClickListener {
-            TODO("Implement start of activity once MapActivity is created")
+            // Implement start of activity once MapActivity is created
+        }
+    }
+
+    private fun requestPermissions() {
+        val permissions = mutableListOf<String>()
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+
+        if (permissions.isNotEmpty()) {
+            ActivityCompat.requestPermissions(this, permissions.toTypedArray(), REQUEST_PERMISSION_CODE)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            REQUEST_PERMISSION_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission granted
+                    Log.d("NewLogOptionsActivity", "Permissions granted")
+                } else {
+                    // Permission denied
+                    Toast.makeText(this, "Permissions are required to access media files", Toast.LENGTH_SHORT).show()
+                }
+            }
+            TAKE_PHOTO_REQUEST -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                    startActivityForResult(intent, TAKE_PHOTO_REQUEST)
+                } else {
+                    Toast.makeText(this, "Camera permission is required to take photos", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
@@ -94,13 +148,17 @@ class NewLogOptionsActivity : AppCompatActivity() {
                     }
                 }
             }
+        } else {
+            Log.d("NewLogOptionsActivity", "No result obtained")
         }
     }
 
     private fun navigateToLogDetailsActivity(photoUri: String) {
+        Log.d("NewLogOptionsActivity", "Navigating to LogDetailsActivity with URI: $photoUri")
         val intent = Intent(this, LogDetailsActivity::class.java).apply {
             putExtra("photoUri", photoUri)
             putExtra("selectedCountry", selectedCountry)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION) // Add this line
         }
         startActivity(intent)
         finish()
@@ -109,5 +167,9 @@ class NewLogOptionsActivity : AppCompatActivity() {
     private fun getImageUri(bitmap: Bitmap): Uri {
         val path = MediaStore.Images.Media.insertImage(contentResolver, bitmap, "Title", null)
         return Uri.parse(path)
+    }
+
+    companion object {
+        const val REQUEST_PERMISSION_CODE = 100
     }
 }
