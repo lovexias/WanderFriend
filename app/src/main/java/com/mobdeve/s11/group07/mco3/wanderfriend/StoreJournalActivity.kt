@@ -45,28 +45,15 @@ class StoreJournalActivity : AppCompatActivity() {
 
         // Set up the RecyclerView with the CountryAdapter
         countryAdapter = CountryAdapter(countries) { selectedCountry ->
-            // Handle storing the photo in the selected country's journal
-            Log.d("StoreJournalActivity", "Storing photo in journal for Country: ${selectedCountry.name.common}, Country ID: ${selectedCountry.countryId}")
+            // Log and create an intent to redirect to LogDetailsActivity
+            Log.d("StoreJournalActivity", "Selected Country: ${selectedCountry.name.common}, Country ID: ${selectedCountry.countryId}")
 
-            val log = CountryLog(
-                logId = 0,  // Assuming '0' for auto-increment if needed
-                countryId = selectedCountry.countryId,
-                date = "2024-08-06",  // Replace with actual date input if available
-                caption = "Sample Caption",  // Replace with actual caption input if available
-                photoUri = photoUri ?: ""
-            )
-
-            val success = dbHelper.addLog(log)
-            if (success) {
-                Log.d("StoreJournalActivity", "Log successfully added to Country ID: ${selectedCountry.countryId}")
-                val intent = Intent(this, JournalActivity::class.java).apply {
-                    putExtra("selectedCountry", selectedCountry)
-                }
-                startActivity(intent)
-                finish()
-            } else {
-                Log.e("StoreJournalActivity", "Failed to add log to Country ID: ${selectedCountry.countryId}")
+            // Create an intent to navigate to LogDetailsActivity
+            val intent = Intent(this, LogDetailsActivity::class.java).apply {
+                putExtra("selectedCountry", selectedCountry)  // Pass the selected country
+                putExtra("photoUri", photoUri)  // Pass the photo URI
             }
+            startActivity(intent)
         }
 
         journalRecyclerView.adapter = countryAdapter
