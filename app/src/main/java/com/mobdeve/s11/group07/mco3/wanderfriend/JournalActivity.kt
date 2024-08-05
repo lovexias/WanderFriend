@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 class JournalActivity : AppCompatActivity() {
@@ -56,8 +56,8 @@ class JournalActivity : AppCompatActivity() {
             logs.forEach { log ->
                 Log.d("JournalActivity", "Log ID: ${log.logId}, Date: ${log.date}, Caption: ${log.caption}, Photo URI: ${log.photoUri}")
             }
-            // Set up the RecyclerView to display logs
-            recyclerViewLogs.layoutManager = LinearLayoutManager(this)
+            // Set up the RecyclerView with GridLayoutManager to display logs in two columns
+            recyclerViewLogs.layoutManager = GridLayoutManager(this, 2)
             recyclerViewLogs.adapter = LogsAdapter(logs)
             scrollToBottom()
         } ?: run {
