@@ -10,6 +10,7 @@ import com.squareup.picasso.Picasso
 
 class CountryAdapter(
     private val countries: List<Country>,
+    private val logCounts: Map<Long, Int>, // Map of countryId to log count
     private val onCountrySelected: (Country) -> Unit
 ) : RecyclerView.Adapter<CountryAdapter.CountryViewHolder>() {
 
@@ -20,7 +21,9 @@ class CountryAdapter(
 
         fun bind(country: Country) {
             countryName.text = country.name.common
-            journalCaption.text = "No logs available" // Placeholder text for journal caption
+            // Get the log count for the current country
+            val logCount = logCounts[country.countryId] ?: 0
+            journalCaption.text = if (logCount > 0) "$logCount logs available" else "No logs available"
             Picasso.get().load(country.flags.png).into(countryFlag)
 
             itemView.setOnClickListener {

@@ -43,8 +43,12 @@ class StoreJournalActivity : AppCompatActivity() {
         val countries = dbHelper.getAllCountries()
         Log.d("StoreJournalActivity", "Retrieved ${countries.size} countries from database")  // Debug log
 
+        // Fetch log counts for each country
+        val logCounts = dbHelper.getLogCountsByCountry()
+        Log.d("StoreJournalActivity", "Log counts: $logCounts")  // Debug log
+
         // Set up the RecyclerView with the CountryAdapter
-        countryAdapter = CountryAdapter(countries) { selectedCountry ->
+        countryAdapter = CountryAdapter(countries, logCounts) { selectedCountry ->
             // Log and create an intent to redirect to LogDetailsActivity
             Log.d("StoreJournalActivity", "Selected Country: ${selectedCountry.name.common}, Country ID: ${selectedCountry.countryId}")
 

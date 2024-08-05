@@ -46,10 +46,10 @@ class UserDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_USERS")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_COUNTRIES")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_COUNTRY_LOG")
-        onCreate(db)
+        // Check the current version and upgrade accordingly
+        if (oldVersion < 2) {
+            db.execSQL("ALTER TABLE $TABLE_COUNTRY_LOG ADD COLUMN $COLUMN_LOG_COUNTRY_ID INTEGER") // Add countryId if not exists
+        }
     }
 
     fun addUser(user: User): Boolean {
@@ -72,7 +72,10 @@ class UserDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
             } else {
                 db.insert(TABLE_USERS, null, values)
             }
-            Log.d("UserDatabaseHelper", "User added/updated: ${user.name}, ${user.age}, ${user.country}, ${user.traveledCountries.map { it.name.common }}, Success: $success")
+            Log.d(
+                "UserDatabaseHelper",
+                "User added/updated: ${user.name}, ${user.age}, ${user.country}, ${user.traveledCountries.map { it.name.common }}, Success: $success"
+            )
             success != -1L
         } catch (e: Exception) {
             Log.e("UserDatabaseHelper", "Error adding/updating user", e)
@@ -93,11 +96,16 @@ class UserDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
                 val name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME))
                 val age = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_AGE))
                 val country = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_COUNTRY))
-                val traveledCountriesJson = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TRAVELED_COUNTRIES))
+                val traveledCountriesJson =
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TRAVELED_COUNTRIES))
                 val traveledCountriesType = object : TypeToken<List<Country>>() {}.type
-                val traveledCountries: List<Country> = Gson().fromJson(traveledCountriesJson, traveledCountriesType)
+                val traveledCountries: List<Country> =
+                    Gson().fromJson(traveledCountriesJson, traveledCountriesType)
                 user = User(id, name, age, country, traveledCountries)
-                Log.d("UserDatabaseHelper", "User retrieved: ${user.name}, ${user.age}, ${user.country}, ${user.traveledCountries.map { it.name.common }}")
+                Log.d(
+                    "UserDatabaseHelper",
+                    "User retrieved: ${user.name}, ${user.age}, ${user.country}, ${user.traveledCountries.map { it.name.common }}"
+                )
             }
             cursor.close()
             user
@@ -198,6 +206,26 @@ class UserDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         }
     }
 
+    // Retrieve log counts for each country
+    fun getLogCountsByCountry(): Map<Long, Int> {
+        val logCounts = mutableMapOf<Long, Int>()
+        val db = readableDatabase
+
+        // Query to count logs for each country
+        val query = "SELECT $COLUMN_LOG_COUNTRY_ID, COUNT(*) as logCount FROM $TABLE_COUNTRY_LOG GROUP BY $COLUMN_LOG_COUNTRY_ID"
+        val cursor = db.rawQuery(query, null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                val countryId = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_LOG_COUNTRY_ID))
+                val logCount = cursor.getInt(cursor.getColumnIndexOrThrow("logCount"))
+                logCounts[countryId] = logCount
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        return logCounts
+    }
 
     fun getAllCountries(): List<Country> {
         val db = this.readableDatabase
@@ -226,7 +254,7 @@ class UserDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
     }
 
     companion object {
-        private const val DATABASE_VERSION = 52
+        private const val DATABASE_VERSION = 71
         private const val DATABASE_NAME = "userDatabase"
         const val TABLE_USERS = "users"
         const val COLUMN_ID = "id"
