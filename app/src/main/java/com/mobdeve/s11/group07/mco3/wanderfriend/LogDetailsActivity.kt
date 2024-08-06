@@ -65,6 +65,27 @@ class LogDetailsActivity : AppCompatActivity() {
         dateInput.setOnClickListener {
             showDatePickerDialog()
         }
+
+        // FOOTER BUTTONS, this code must be present in every activity with a footer
+        cameraButton = findViewById(R.id.cameraButton)
+        cameraButton.setOnClickListener{
+            val intent = Intent(this, CameraActivity::class.java)
+            startActivity(intent)
+        }
+
+        journalButton = findViewById(R.id.journalButton)
+        journalButton.setOnClickListener {
+            val intent = Intent(this, JournalMainActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
+        mapButton = findViewById(R.id.mapButton)
+        mapButton.setOnClickListener{
+            val intent = Intent(this, MapsActivity::class.java)
+            startActivity(intent)
+        }
+        // END OF FOOTER BUTTONS
     }
 
     /**

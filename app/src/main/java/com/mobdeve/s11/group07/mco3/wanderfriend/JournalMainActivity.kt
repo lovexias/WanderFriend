@@ -68,6 +68,7 @@ class JournalMainActivity : AppCompatActivity() {
         cameraButton.setOnClickListener{
             val intent = Intent(this, CameraActivity::class.java)
             startActivity(intent)
+            finish()
         }
 
         journalButton = findViewById(R.id.journalButton)
@@ -83,7 +84,6 @@ class JournalMainActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
-
         // END OF FOOTER BUTTONS
 
         newJournalBtn = findViewById(R.id.newJournalBtn)

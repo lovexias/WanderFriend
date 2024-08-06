@@ -27,7 +27,8 @@
 
         <activity
             android:name=".MapsActivity"
-            android:exported="false" />
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"/>
         <activity
             android:name=".LogDetailsActivity"
             android:exported="true"

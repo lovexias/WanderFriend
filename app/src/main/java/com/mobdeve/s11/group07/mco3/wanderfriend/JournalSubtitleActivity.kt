@@ -78,7 +78,7 @@ class JournalSubtitleActivity : AppCompatActivity() {
 
         // FOOTER BUTTONS, this code must be present in every activity with a footer
         cameraButton = findViewById(R.id.cameraButton)
-        cameraButton.setOnClickListener {
+        cameraButton.setOnClickListener{
             val intent = Intent(this, CameraActivity::class.java)
             startActivity(intent)
         }
@@ -91,8 +91,10 @@ class JournalSubtitleActivity : AppCompatActivity() {
         }
 
         mapButton = findViewById(R.id.mapButton)
-        mapButton.setOnClickListener {
-            // Implement start of activity once MapActivity is created
+        mapButton.setOnClickListener{
+            val intent = Intent(this, MapsActivity::class.java)
+            startActivity(intent)
         }
+        // END OF FOOTER BUTTONS
     }
 }

@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Button
+import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -20,6 +21,10 @@ class CameraActivity : AppCompatActivity() {
     private val REQUEST_IMAGE_CAPTURE = 1
     private val REQUEST_CAMERA_PERMISSION = 100
     private lateinit var captureButton: Button
+
+    private lateinit var cameraButton: ImageButton
+    private lateinit var journalButton: ImageButton
+    private lateinit var mapButton: ImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +39,29 @@ class CameraActivity : AppCompatActivity() {
         captureButton.setOnClickListener {
             dispatchTakePictureIntent()
         }
+
+        // FOOTER BUTTONS, this code must be present in every activity with a footer
+        cameraButton = findViewById(R.id.cameraButton)
+        cameraButton.setOnClickListener{
+            val intent = Intent(this, CameraActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
+        journalButton = findViewById(R.id.journalButton)
+        journalButton.setOnClickListener {
+            val intent = Intent(this, JournalMainActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
+        mapButton = findViewById(R.id.mapButton)
+        mapButton.setOnClickListener{
+            val intent = Intent(this, MapsActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+        // END OF FOOTER BUTTONS
     }
 
     private fun dispatchTakePictureIntent() {

@@ -84,9 +84,7 @@ class NewLogOptionsActivity : AppCompatActivity() {
         mapButton.setOnClickListener{
             val intent = Intent(this, MapsActivity::class.java)
             startActivity(intent)
-            finish()
         }
-
         // END OF FOOTER BUTTONS
     }
 

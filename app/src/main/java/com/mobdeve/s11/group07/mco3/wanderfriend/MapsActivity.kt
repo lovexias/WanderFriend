@@ -51,6 +51,7 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
         cameraButton.setOnClickListener{
             val intent = Intent(this, CameraActivity::class.java)
             startActivity(intent)
+            finish()
         }
 
         journalButton = findViewById(R.id.journalButton)
@@ -66,7 +67,6 @@ class MapsActivity : FragmentActivity(), OnMapReadyCallback {
             startActivity(intent)
             finish()
         }
-
         // END OF FOOTER BUTTONS
     }
 

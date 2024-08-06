@@ -8,6 +8,7 @@ import android.os.Looper
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.core.content.res.ResourcesCompat
+import java.io.File
 
 class LoadingScreenActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,6 +24,6 @@ class LoadingScreenActivity : ComponentActivity() {
             val intent = Intent(this, CreateProfileActivity::class.java)
             startActivity(intent)
             finish()
-        }, 1000) // 1 second delay, change to 5000 later
+        }, 1000) // 1 second delay
     }
 }
